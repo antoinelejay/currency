@@ -1,0 +1,330 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2015 by Scott Pakin <scott+dtx@pakin.org>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{currency.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{currency}
+%<*package>
+    [2017/05/25 v0.1 .dtx currency file]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{currency}
+\usepackage{url}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{currency.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/07/07}{Initial version}
+%
+% \GetFileInfo{currency.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+% 
+%
+% \title{The \textsf{currency} package\thanks{This document
+%   corresponds to \textsf{currency}~\fileversion, dated \filedate.}}
+% \author{Antoine Lejay \\ \texttt{Antoine.Lejay@univ-lorraine.fr}}
+%
+% \maketitle
+%
+% 
+% \DefineCurrency{EUR}{name={euro},plural-name={euros},symbol={\euro},iso={EUR},kind=iso}
+% \DefineCurrency{USD}{name={dollar},plural-name={dollars},symbol={\$},iso={USD},kind=iso}
+%
+% \section{Introduction}
+%
+% This package creates macros for defined currencies which follow
+% the ISO 4217 codes, with various formatting options for both
+% the currency (code, symbols, names, ...) and the numbers (using \texttt{siunitx}).
+% 
+% The currency code ISO 4217 specifies the code of the currency as
+% a three-letters code. The first two ones are the code of the country
+% according to ISO 3166. The last one is the name of the currency name. 
+%
+% \section{Licence}
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   \url{http://www.latex-project.org/lppl.txt}
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Antoine Lejay.
+%
+% \section{Documentation and sources}
+%
+% This package is documented in \texttt{currency\_doc}.
+%
+% A source of this package is hosted in
+% \begin{center}
+% \url{https://github.com/antoinelejay/currency}
+% \end{center}
+%
+% \section{Implementation}
+%
+% \subsection{Dependencies}
+%
+%    \begin{macrocode}
+\RequirePackage{siunitx}
+\RequirePackage{pgfkeys}
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+\RequirePackage{expl3}
+\RequirePackage{textcomp}
+\RequirePackage{eurosym}
+%    \end{macrocode}
+% The unit could be printed before or after
+%    \begin{macrocode}
+\newif\ifcurrencynumber 
+\pgfkeys{/currency/.cd,number/.is if=currencynumber,number=true}
+\newif\ifprintbefore
+\pgfkeys{/currency/pre/.is if=printbefore}
+\pgfkeys{/currency/name/.initial=ZZZ}
+\pgfkeys{/currency/symbol/.initial=\textcurrency}
+%    \end{macrocode}
+%
+% Defines a style currency, which is general and empty. 
+% The styles are then called in order 
+%   - the currency style
+%   - currency (initially empty)
+%   - the options passed to the command
+
+%    \begin{macrocode}
+\pgfkeys{/currency/currency/.style={}}
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\newcommand{\CurrencySetup}[1]{%
+    \pgfkeys{/currency/currency/.style={#1}}%
+}
+\newcommand{\CurrencySetupAppend}[1]{%
+    \pgfkeys{/currency/currency/.append style={#1}}%
+}
+%    \end{macrocode}
+%
+% \subsection{Names and symbols definitions}
+%
+% The commands \verb|\currencyName|, \verb|\currencyNames|, \verb|\currencyISO| and \verb|\currencySymbol|
+% are used internally every time a currency is called to define the name, the plural, 
+% the ISO code and the symbol associated to a currency.
+%
+%    \begin{macrocode}
+\pgfkeys{/currency/name/.store in=\currencyName}
+\pgfkeys{/currency/plural/.store in=\currencyNames}
+\pgfkeys{/currency/plural/.initial=\currencyName s}
+\pgfkeys{/currency/iso/.store in=\currencyISO}
+\pgfkeys{/currency/symbol/.store in=\currencySymbol}
+%    \end{macrocode}
+%
+% \subsection{Keys for formatting}
+%
+% Several keys are devoted to insert tokens before or after th unit 
+% and the amount, set up the font, ...
+%
+%    \begin{macrocode}
+% between the symbol and the num if before
+\pgfkeys{/currency/pre-between/.initial={~}} 
+% between the symbol and the num if after
+\pgfkeys{/currency/post-between/.initial={~}} 
+% tokens that are inserted before
+\pgfkeys{/currency/before/.initial={}} 
+% append to before
+\pgfkeys{/currency/before+/.code={\pgfkeys{/currency/before/.append={#1}}}} 
+% prepend to before
+\pgfkeys{/currency/before</.code={\pgfkeys{/currency/before/.prefix={#1}}}} 
+\pgfkeys{/currency/after/.initial={}} % tokens that are inserted after
+% append to after
+\pgfkeys{/currency/after+/.code={\pgfkeys{/currency/after/.append={#1}}}} 
+% prepend to after
+\pgfkeys{/currency/after</.code={\pgfkeys{/currency/after/.prefix={#1}}}} 
+\pgfkeys{/currency/font/.initial={}} % for setting up the fonts
+% append to the font definition
+\pgfkeys{/currency/font+/.code={\pgfkeys{/currency/font/.append={#1}}}} 
+% the prefix before the name
+\pgfkeys{/currency/prefix/.initial={}} 
+%    \end{macrocode}
+%
+% Several options are given for printing the kind of unit (\verb|iso|, 
+% \verb|plural|, \verb|name|, \verb|symbol|).
+%    \begin{macrocode}
+%
+\pgfkeys{/currency/kind/.is choice}
+\pgfkeys{/currency/kind/iso/.code=%
+    {\def\currencyunit{\currencyISO}}}
+\pgfkeys{/currency/kind/plural/.code=%
+    {\def\currencyunit{\currencyNames}\printbeforefalse}}
+\pgfkeys{/currency/kind/name/.code=%
+    {\def\currencyunit{\currencyName}\printbeforefalse}}
+\pgfkeys{/currency/kind/symbol/.code=%
+    {\def\currencyunit{\currencySymbol}}}
+\pgfkeys{/currency/kind=iso}
+%    \end{macrocode}
+%
+% Options are also define for printing the cents (\verb|true|, \verb|false|, \verb|always|).
+%
+%    \begin{macrocode}
+\pgfkeys{/currency/cents/.is choice}
+\pgfkeys{/currency/cents/true/.code=%
+    {\sisetup{zero-decimal-to-integer=true}}}
+\pgfkeys{/currency/cents/false/.code=%
+    {\sisetup{zero-decimal-to-integer=true,round-precision=0}}}
+\pgfkeys{/currency/cents/always/.code=%
+    {\sisetup{zero-decimal-to-integer=false,round-integer-to-decimal=true}}}
+\pgfkeys{/currency/cents=true}
+%    \end{macrocode}
+%
+% \subsection{Dealing with unknown keys}
+%
+% The unknown keys are passed to the \verb|\num| command of \texttt{siunitx}, which use the \LaTeX3 syntax
+% and not the pgf one. 
+%
+%    \begin{macrocode}
+\ExplSyntaxOn
+\pgfkeys{/currency/.unknown/.code={%
+\edef\Unknown{\pgfkeyscurrentname=\pgfkeyscurrentvalue}%
+\keys_set:nV {siunitx} {\Unknown}%
+    }}%
+\ExplSyntaxOff
+%    \end{macrocode}
+%
+% \subsection{Setting the precision}
+%
+% The key \verb|base| is used to set the precision. 
+% Its value is passed to the key \verb|round-precision| of \verb|siunitx|.
+%
+%    \begin{macrocode}
+\ExplSyntaxOn
+\pgfkeys{/currency/base/.code={%
+\edef\SetPrecision{round-precision=\pgfkeyscurrentvalue}%
+\keys_set:nV {siunitx} {\SetPrecision}%
+    }}%
+\ExplSyntaxOff
+%    \end{macrocode}
+%
+% \subsection{Defining new currencies}
+%
+% The first argument is the name of the currency, normally its ISO symbol (3 letters).
+% This commands defines two global commands.
+%
+% \begin{macro}{\DefineCurrency} 
+% Define the parameters for a new currency. The first parameter is 
+% a three letters code of type \verb|XXX| (actually, it should by any suitable word).
+% Global commands \verb|\dXXX|
+% (for printing currency with an amount)
+% and \verb|\cXXX| (for printing only the symbols) are then defined, as
+% well as a style under the pgfkey \verb|/currency/XXX|.
+%
+%    \begin{macrocode}
+\newcommand{\DefineCurrency}[2]{%
+\pgfkeys{/currency/#1/.style={#2}}%%
+% define the currency with digits as \dXXX
+\global\expandafter\DeclareDocumentCommand\csname d#1\endcsname{o m}{%
+\begingroup%
+% default parameters, to put outside
+\sisetup{round-mode=places,round-precision=2}
+\IfNoValueTF{##1}%
+    {\pgfkeys{/currency/.cd,#1,currency}}%
+    {\pgfkeys{/currency/.cd,#1,currency,##1}}%
+\ifbool{currencynumber}%
+    {\sisetup{parse-numbers=true}}%
+    {\sisetup{parse-numbers=false}}%
+\edef\value{##2}% store the value of the currency
+%
+\ifprintbefore%
+% true clause / print the unit before
+\pgfkeys{/currency/font}%
+\pgfkeys{/currency/before}%
+\text{\pgfkeys{/currency/prefix}\currencyunit}%
+\pgfkeys{/currency/pre-between}%
+\num{\value}\pgfkeys{/currency/after}%
+\else% print the unit after 
+\pgfkeys{/currency/font}%
+\pgfkeys{/currency/before}%
+\num{\value}%
+\pgfkeys{/currency/post-between}%
+\text{\pgfkeys{/currency/prefix}\currencyunit}%
+\pgfkeys{/currency/after}%
+\fi%
+\endgroup%
+    }%
+    % define the currency symbol as \cXXX with one optional argument
+    \global\expandafter\DeclareDocumentCommand\csname c#1\endcsname{o}{%
+\begingroup%
+    \IfNoValueTF{##1}%
+	{\pgfkeys{/currency/.cd,#1,currency}}%
+	{\pgfkeys{/currency/.cd,#1,currency,##1}}%
+    \pgfkeys{/currency/font}%
+    \pgfkeys{/currency/before}%
+    \text{\pgfkeys{/currency/prefix}\currencyunit}
+	\pgfkeys{/currency/after}%
+\endgroup%
+    }%
+}%
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Predefined styles}
+%
+% Some styles are defined to shorten the typesetting.
+%
+%    \begin{macrocode}
+\pgfkeys{/currency/@iso/.style={kind=iso}}
+\pgfkeys{/currency/@symb/.style={kind=symbol}}
+\pgfkeys{/currency/@sy/.style={kind=symbol}}
+\pgfkeys{/currency/@name/.style={kind=name}}
+\pgfkeys{/currency/@na/.style={kind=name}}
+\pgfkeys{/currency/@plural/.style={kind=plural}}
+\pgfkeys{/currency/@pl/.style={kind=plural}}
+%    \end{macrocode}
+%
+% \Finale
+\endinput

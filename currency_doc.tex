@@ -1,0 +1,408 @@
+\documentclass[12pt,add-index]{cnltx-doc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage{currency}
+\usepackage{enumitem}
+\usepackage{filecontents}
+\usepackage[
+backend=biber,
+style=cnltx,
+sortlocale=en_EN,
+indexing=cite,
+useprefix]{biblatex}
+\usepackage{nicefrac}
+
+\addbibresource{\jobname.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{filecontents*}{\jobname.bib}
+@online{iso,
+    author = {{ISO committee}},
+    title = {Currency codes - ISO 4217},
+    url = {http://www.iso.org/iso/home/standards/currency_codes.htm},
+    year = {2015},
+}
+
+@online{iso:wikipedia,
+    editor = {Wikipedia},
+    title = {ISO 4217},
+    url = {https://en.wikipedia.org/wiki/ISO_4217},
+    year = {2015},
+}
+
+@package{siunitx,
+    author = {Wright, Joseph},
+    title = {\texttt{siunitx} — A comprehensive (SI) units package},
+    date = {2014-10-28},
+   note = {Version 2.6d},
+}
+
+@package{translations, 
+    author = {Niederberger, Clemens},
+    title = {\texttt{translations}, Internationalization of \LaTeX2e Packages},
+    date = {2017-05-16},
+    note = {Version 1.6},
+}
+    
+\end{filecontents*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcnltx{
+  package  = {currency},
+  info     = {Print monetary units} ,
+  url      = https://github.com/antoinelejay/currency.git ,
+  authors  = Antoine Lejay,
+  email    = antoine.lejay@univ-lorraine.fr ,
+  abstract = {%
+      This packages aims at typesetting monetary units in a consistent way.
+  } ,
+  add-cmds = 
+  {
+      dXXX,cXXX,CurrencySetup
+  } ,
+  add-silent-cmds = {
+  } ,
+  index-setup = { othercode=\footnotesize, level=\section , noclearpage } ,
+  makeindex-setup = {  columns=3, columnsep=1em }
+}
+
+% Some currencies definition
+\DefineCurrency{EUR}{name={euro},plural={euros},symbol={\euro},iso={EUR},kind=iso,base=2}
+\DefineCurrency{USD}{name={dollar},plural={dollars},symbol={\$},iso={USD},kind=iso,base=2}
+\DefineCurrency{JPY}{name={yen}, plural={yens}, symbol={\textyen}, iso={JPY}, kind=iso,cents=false} 
+\DefineCurrency{GBP}{name={pound},pre=true,plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso,base=2} 
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+Strangely enough, it seems that no package deals with a conveninent, 
+normalized way to print monetary units and values. Built on the top
+of the \pkg{siunitx}, this package 
+then aims at providing a consistant and coherent way to format such 
+quantities. In particular, we consider printing values and unit 
+\begin{itemize}[noitemsep=0pt,topsep=0pt]
+\item In the ISO format (ISO 4217),
+\item In their usual name (dollar, \cEUR[kind=name], ...), singular and plurals,
+\item Using their ususal symbols (\$, \cEUR[kind=symbol],...).
+\end{itemize}
+
+The currency code ISO 4217 specifies the code of the currency as
+a three-letters code. The first two ones are the code of the country
+according to ISO 3166. The last one is the name of the currency name. 
+
+This package creates macros for defined currencies which follow
+the ISO 4217 codes. 
+
+This package is then useful for current monetary units, using 
+the decimal systems and cents, written in western format.
+Non decimal systems such as 
+the \emph{pound shilling pennies} are not supported. 
+
+\section{Licence and Requirements}
+\license
+
+The \pkg*{currency} package needs and thus loads the packages
+\pkg{siunitx}, \pkg{pgfkeys}, \pkg{etoolbox}, \pkg{xparse}, 
+\pkg{expl3}, \pkg{textcomp} and \pkg{eurosym}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Currency definition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+\section{Currency definition}
+
+\begin{commands}
+    \command{DefineCurrency}[\marg{ISO}\marg{maps}] 
+    defines a new currency (there is no warning if a currency is being redefined).
+\end{commands}
+
+A new currency is defined  with this command. The argument \Darg{ISO}
+is the ISO format (a unique code in three letters based on country codes \cite{iso,iso:wikipedia}, \eg, USD
+for \emph{United States Dollar}), or any suitable name from which commands will be created.
+Its characteristics are defined through key-values pairs, the so-called \Darg{map}.
+
+When \verb|XXX| is the ISO code (or any other code), it defines 
+two commands \verb|\dXXX| and \verb|\cXXX| for using these units in the text.
+These commands are defined globally. 
+See Section~\ref{sec:using}.
+
+
+For example, to define the US dollars, we set
+
+\begin{sourcecode}
+    \DefineCurrency{USD}{name={dollar},plural={dollars},iso={USD},kind=iso,symbol={\$}}
+\end{sourcecode}
+
+
+Other styles may be defined through \cs*{pgfkeys} by following this example:
+\begin{example}
+    \pgfkeys{/currency/my style/.style={locale=US,kind=plural}}
+    \dUSD[my style]{100.10}
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Key-values when defining or using a currency.}
+
+Several key-values pair are defined. Since this package relies on \pkg{siunitx},
+it is also possible to use any key-values from this latest package, for example 
+to control the ways the values are printed (separators, ...).
+
+\begin{options}
+    \keyval{name}{name}\Default{ZZZ} The name of the currency (\eg, dollar, yen, ...).
+    \keyval{plural}{plural}\Default{\textit{name} s} The plural form of the name of the currency.
+    \keyval{iso}{iso} The ISO code of the currency.
+    \keyval{symbol}{symbol}\Default{\textcurrency} The symbol for the currency, if any (\eg, \cEUR[kind=symbol], \cUSD[kind=symbol], ...).
+    \keyval{pre-between}{tokens}\Default{no break space}
+	The tokens that are placed between the name and the value when the name 
+	is printed before. 
+    \keyval{post-between}{tokens}\Default{no break space} 
+	The tokens that are placed between the name and the value when the name 
+	is printed after. 
+    \keyval{before}{tokens}\Default{} What is printed before. 
+    \keyval{before+}{tokens} Append the content to \option{before}.
+    \keyval{before<}{tokens} Prepend the content to \option{before}.
+    \keyval{font}{tokens} For setting up the font which is used for both the unit and the amount (previous uses of \option{font} are overrided).
+    \keyval{font+}{tokens} Add the content to \option{font}.
+    \keyval{after}{tokens} What is printed after.
+    \keyval{after+}{tokens} Append to what is print after.
+    \keyval{after<}{tokens} Prepend to what is print after.
+    \keyval{prefix}{tokens}\Default What is printed before the name (\eg, k, M, ...).
+    \keychoice{kind}{\default{iso},plural,name,symbol}
+    The representation of the monetary unit.
+    \keychoice{cents}{\default{true},false,always}
+    Control the way the cents are printed.
+    \keychoice{pre}{true,\default{false}} Select if the unit should be print before or after the value (only for ISO code and symbols).
+    \keybool{number} Parse the values (interface to \option{parse-numbers} from \pkg{siunitx}).
+
+    \keyval{base}{integer}\Default{2} Number of digits for the cents.
+\end{options}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Examples 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Examples}
+
+No currency are actually defined in \pkg{currency}.
+Euros, US dollars, yens and pounds could be defined by 
+\begin{sourcecode}
+    \DefineCurrency{EUR}{name={euro}, plural={euros}, symbol={\euro}, iso={EUR}, kind=iso}
+    \DefineCurrency{USD}{name={dollar}, plural={dollars}, symbol={\$}, iso={USD}, kind=iso} 
+    \DefineCurrency{JPY}{name={yen}, plural={yens}, symbol={\textyen}, iso={JPY}, kind=iso,cents=false} 
+    \DefineCurrency{GBP}{name={pound},pre=true,plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso} 
+\end{sourcecode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Using currencies
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Using currencies}
+\label{sec:using}
+
+\subsection{Using currencies}
+
+Currencies are used with or without amounts. They could also be changed locally. 
+
+\begin{commands}
+    \command{CurrencySetup}[\marg{maps}]
+    This command defines a \emph{style} in the sense of \pkg{pgfkeys}, that 
+    is a series of keys-values pairs.  
+    These maps are exectued after
+    the ones defining the format of the currency but before the optional 
+    argument passed to \cs{dXXX} or \cs{cXXX} where \texttt{XXX} is
+    the ISO 4217 code of the currency. It could be used to change locally 
+    the setting of a currency. Using this command overrides the previous settings of
+    \cs*{CurrencySetup}. The command \cs{CurrencySetupAppend} append to the current style.:w
+    The style is stored in \verbcode|/currency/currency/.style|.
+    \command{CurrencySetupAppend}[\marg{maps}] Similar to \cs{CurrencySetup} but 
+    append the style.
+    \command{dXXX}[\oarg{maps}] Print only the monetary unit with currency code \texttt{XXX}.
+    \command{cXXX}[\oarg{maps}\marg{value}] Print the value with the monetary unit with currency code \texttt{XXX}.
+\end{commands}
+
+\subsection{How currencies are composed?}
+
+The commands \cs{cXXX} and \cs{dXXX} are expanded inside a group. 
+The argument \meta{value} for \cs{cXXX} is stored into \cs*{value}.
+Besides, the unit is stored into \cs*{currencyunit} according 
+to the value of \option{kind}.
+
+When using \cs{dXXX}, the order in which the elements are composed is 
+\begin{quote}
+    \option{font}\ \option{before}\ \option{prefix}\ \cs*{currencyunit}\ \option{pre-between}\
+    \cs*{value}\ \option{after}
+\end{quote}
+when the currency unit is printed before (\code{pre=false}), and 
+\begin{quote}
+     \option{font}\ \option{before}\ \cs*{value}\ \option{post-betwen}\ \option{prefix}\ \cs*{currencyunit}\ \option{after}
+\end{quote}
+otherwise (\code{pre=true}).
+
+The rules are
+\begin{itemize}[leftmargin=2em,itemsep=0pt]
+    \item The value (mandatory argument) specified by \meta{value} is printed
+	using \verbcode|\num{\value}| using the \cs{num} command from \pkg{siunitx}, and the value
+	is stored locally into \cs*{value}.
+    \item Both \option{prefix} and \option{unit} are enclosed into a \cs{text} command
+	so that they could safely be used in math mode.
+\end{itemize}
+
+When using \cs{cXXX}, the order in which the elements are composed is 
+\begin{quote}
+    \option{font}\ \option{before}\ \option{prefix}\ \cs*{currencyunit}\ \option{after}
+\end{quote}
+where \option{prefix} and \cs*{currencyunit} are enclosed in a \cs{text} command.
+The boolean option \option{pre} is useless in this case.
+
+\subsection{The hierarchy of keys definitions}
+
+The order in which the keys are defined (and then overwritten) is
+\begin{itemize}[leftmargin=2em,itemsep=0pt]
+    \item Default options values.
+    \item Command \cs{DefineCurrency}.
+    \item Command \cs{CurrencySetup}, which is a shorthand for defining 
+	the pgfkey \verbcode|/currency/currency/.style|. 
+    \item Command \cs{cXXX} ou \cs{dXXX} (the commands are executed
+	in a group).
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Examples
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Examples}
+
+\subsubsection{Punctuation.}
+
+The commands \cs{dXXX} and \cs{cXXX} are defined using 
+the \pkg{xparse} package. The space is preserved after the command
+so that there is no need to use \verbcode|\| after a command.
+
+\begin{example}
+    The total gross salary is \dEUR{2000}. A part of \dEUR{1500} forms the net salary.
+\end{example}
+
+\paragraph*{Using a prefix}
+
+\begin{example}
+    The total cost of the project is \dEUR[prefix=M,kind=symbol]{0.5}.
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Changing the base}
+
+Most of the currencies have \emph{cents}, that is a monetary unit equal to $\nicefrac{1}{100}$ 
+of the monetary unit. It is however possible to use another number of digits, either 
+for special purposes, or for monetary units with other bases such as the Kuwaiti dinar
+which is decomposed in \num{1000} fils.
+
+\begin{example}
+    \DefineCurrency{KWD}{name={dinar},plural={dinars},symbol={KD},iso={KWD},kind=iso,base=3}
+    $\dUSD{1}=\dKWD{0.29963}$
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Changing the font}
+
+Using the \key{font}{tokens} key, it is possible to change the font which 
+is used for the monetary units (remember that everything is enclosed into a group). 
+When used in the currency definition and in \cs{CurrencySetup}, 
+it is however supersed by any other \key{font}{tokens} key used in \cs{dXXX}
+(A similar result could be obtained with \key{before}{tokens}, which aims
+at putting some material). To avoid this, \key{font+}{tokens} shall be used.
+
+Numbers are typesetted using a upright font. The \option*{detect-...}
+options of \pkg{siunitx} could be used to change \cite[\S~5.2]{siunitx}.
+However, they should be passed as boolean keys. 
+
+
+\begin{example}
+    \textit{It costs \dUSD{1}}.
+    \textit{It costs \dUSD[font=\normalfont]{1}}.
+    \begin{empty}
+    \CurrencySetup{font=\normalfont}
+    \textit{It costs \dUSD{1}}.
+    \textit{It costs \dUSD[font+=\bfseries]{1}}.
+    \textit{It costs \dUSD[font=\bfseries]{1}}.
+    \textit{It costs \dUSD[font=\bfseries,detect-weight=true]{1}}.
+    \textit{It costs \dUSD[font=\bfseries,detect-all=true]{1}}.
+    \end{empty}
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph*{Using \option{before} and \option{after}}
+
+The use of \key{before}{tokens} is similar to the one of \key{font}{tokens}.
+It is possible to append or to prepend the value to existing ones
+defined as a higher level through \key{before+}{tokens} and \key{before<}{tokens}.
+Similarly, one could use \key{after}{tokens}, \key{after+}{tokens} and \key{after<}{tokens}.
+
+\begin{example}
+    \CurrencySetup{before=X}
+    \dUSD[before+={\color{red}}]{1}
+    \dUSD[before<={\color{red}}]{1}
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using siunitx's features}
+
+Any key of the \pkg{siunitx} package could be used. 
+For example, localization may change the unit separator (comma, ...).
+
+\begin{example}
+    This costs \dEUR{12 345.76}.
+    {\sisetup{locale=FR} Cela co\^ute \dEUR{12 345.76}.}
+\end{example}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using styles}
+
+Some styles are aldeary defined to shorten the typesetting. 
+For example, \verbcode|@iso| expands to \verbcode|kind=iso|.
+It
+acts similarly for \verbcode|@sy| (or \verbcode|@symb|), \verbcode|@na| (or \verbcode|@name|) and \verbcode|@pl|
+(or \verbcode|@plural|).
+
+\begin{example}
+    \dEUR[@iso]{10}; \dEUR[@symb]{10}; \dEUR[@name]{10}; \dEUR[@pl]{10}
+
+    \dGBP{10} ; \dGBP[@symb]{10} ; \dGBP[@pl]{10} ; \dGBP{5}
+\end{example}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% TODO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{To Do}
+
+\begin{itemize}
+    \item Store the values to use them later. 
+    \item Automatic detection of plurals.
+    \item Perform simple arithmetics.
+    \item Behavior of \verbcode{detect-...} keys from \pkg{siunitx} with default argument.
+    \item Internationalization using the \texttt{translations} packages \cite{translations}.
+    \item Non decimal systems such as pounds, shillings, and pence.
+    \item Column definition for a table.
+    \item ...
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% References 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\printbibliography
+
+
+\end{document}
