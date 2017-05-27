@@ -22,7 +22,7 @@ to print `123 EUR or 123 euros`. There are many ways to change to output
 typographical conventions, ...).
 
 
-See the [documentation](https://github.com/antoinelejay/currency/blob/master/source/currency_doc.pdf)
+See the [documentation](https://github.com/antoinelejay/currency/blob/master/currency_doc.pdf)
 for examples and installation instructions.
 
 ## License
