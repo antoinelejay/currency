@@ -1,4 +1,4 @@
-# currency — highlighted source code for LaTeX
+# currency — Formatting currencies
 
 
 ## Overview
@@ -33,4 +33,17 @@ version 1.3 or later.
 
 Please use the project's GitHub site at <https://github.com/antoinelejay/currency>
 for suggestions, feature requests, and bug reports.
+
+## Installation
+
+```
+pdflatex currency.ins
+pdflatex currency.dtx
+makeindex -s gind.ist currency.idx
+pdflatex currency.dtx
+
+pdflatex currency_doc.tex
+biber currency_doc
+pdflatex currency_doc.tex
+```
 
