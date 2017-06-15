@@ -16,6 +16,8 @@ useprefix]{biblatex}
 
 \addbibresource{\jobname.bib}
 
+\newnote*\doccorrectedsinceversion[1]{Documentation corrected in version~#1}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{filecontents*}{\jobname.bib}
 @online{iso,
@@ -222,6 +224,7 @@ Currencies are used with or without amounts. They could also be changed locally.
     The style is stored in \verbcode|/currency/currency/.style|.
     \command{CurrencySetupAppend}[\marg{maps}] Similar to \cs{CurrencySetup} but 
     append the style.
+    \doccorrectedsinceversion{0.2}
     \command{cXXX}[\oarg{maps}] Print only the monetary unit with currency code \texttt{XXX}
     (mnemonic \textit{c} stands for \textit{currency}).
     \command{dXXX}[\oarg{maps}\marg{value}] Print the value with the monetary unit with currency code \texttt{XXX} (mnemonic \textit{d} stands for \textit{display}).
