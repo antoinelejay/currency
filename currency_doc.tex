@@ -222,10 +222,12 @@ Currencies are used with or without amounts. They could also be changed locally.
     The style is stored in \verbcode|/currency/currency/.style|.
     \command{CurrencySetupAppend}[\marg{maps}] Similar to \cs{CurrencySetup} but 
     append the style.
-    \command{dXXX}[\oarg{maps}] Print only the monetary unit with currency code \texttt{XXX}.
-    \command{cXXX}[\oarg{maps}\marg{value}] Print the value with the monetary unit with currency code \texttt{XXX}.
+    \command{cXXX}[\oarg{maps}] Print only the monetary unit with currency code \texttt{XXX}
+    (mnemonic \textit{c} stands for \textit{currency}).
+    \command{dXXX}[\oarg{maps}\marg{value}] Print the value with the monetary unit with currency code \texttt{XXX} (mnemonic \textit{d} stands for \textit{display}).
 \end{commands}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{How currencies are composed?}
 
 The commands \cs{cXXX} and \cs{dXXX} are expanded inside a group. 
