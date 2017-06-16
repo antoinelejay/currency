@@ -264,6 +264,7 @@
 % well as a style under the pgfkey \verb|/currency/XXX|.
 %
 %    \begin{macrocode}
+\ExplSyntaxOn
 \newcommand{\DefineCurrency}[2]{%
 \pgfkeys{/currency/#1/.style={#2}}%%
 % define the currency with digits as \dXXX
@@ -295,7 +296,8 @@
 \pgfkeys{/currency/after}%
 \fi%
 \endgroup%
-    }%
+    }% end of \dXXX definition
+    \tl_set:cx {v#1}{\use:c {d#1}}
     % define the currency symbol as \cXXX with one optional argument
     \global\expandafter\DeclareDocumentCommand\csname c#1\endcsname{o}{%
 \begingroup%
@@ -307,8 +309,9 @@
     \text{\pgfkeys{/currency/prefix}\currencyunit}
 	\pgfkeys{/currency/after}%
 \endgroup%
-    }%
+    }% end of \cXXX definition
 }%
+\ExplSyntaxOff
 %    \end{macrocode}
 % \end{macro}
 %
