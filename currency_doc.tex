@@ -292,14 +292,14 @@ so that there is no need to use \verbcode|\| after a command.
     The total gross salary is \dEUR{2000}. A part of \dEUR{1500} forms the net salary.
 \end{example}
 
-\paragraph*{Using a prefix}
+\subsection*{Using a prefix}
 
 \begin{example}
     The total cost of the project is \dEUR[prefix=M,kind=symbol]{0.5}.
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\paragraph*{Changing the base}
+\subsubsection{Changing the base}
 
 Most of the currencies have \emph{cents}, that is a monetary unit equal to $\nicefrac{1}{100}$ 
 of the monetary unit. It is however possible to use another number of digits, either 
@@ -312,7 +312,7 @@ which is decomposed in \num{1000} fils.
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\paragraph*{Changing the font}
+\subsubsection{Changing the font}
 
 Using the \key{font}{tokens} key, it is possible to change the font which 
 is used for the monetary units (remember that everything is enclosed into a group). 
@@ -340,7 +340,7 @@ However, they should be passed as boolean keys.
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\paragraph*{Using \option{before} and \option{after}}
+\subsubsection{Using options before and after}
 
 The use of \key{before}{tokens} is similar to the one of \key{font}{tokens}.
 It is possible to append or to prepend the value to existing ones
@@ -367,7 +367,27 @@ For example, localization may change the unit separator (comma, ...).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using raw formula}
+
+A raw formula could be typeseted using the number option \verbcode|number=false|.
+Beware, this propagate \verbcode|parse-numbers=false| to \verbcode|\num|
+so that any inner call to the latter command should specify 
+\verbcode|parse-numbers=true| if needed. 
+
+A style (see Section~\ref{sec:styles}) \verbcode|no-parse| is equivalent
+to \verbcode|number=false|.
+
+\begin{example}
+    We get a total of \dEUR[number=false]{2\times \num[parse-numbers=true]{10000}}=\dEUR{20000}.
+
+    We get a total of \dEUR[number=false]{2\times \num{10000}}=\dEUR{20000}.
+\end{example}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Using styles}
+\label{sec:styles}
 
 Some styles are aldeary defined to shorten the typesetting. 
 For example, \verbcode|@iso| expands to \verbcode|kind=iso|.
@@ -380,6 +400,9 @@ acts similarly for \verbcode|@sy| (or \verbcode|@symb|), \verbcode|@na| (or \ver
 
     \dGBP{10} ; \dGBP[@symb]{10} ; \dGBP[@pl]{10} ; \dGBP{5}
 \end{example}
+
+A style \verbcode|no-parse| is also equivalent to \verbcode|number=false|.
+\sinceversion{0.2}
 
 
 

@@ -4,7 +4,8 @@
 ## Overview
 
 `currency` is a LaTeX package that facilitates the formatting
-of currencies (amounts and units). It is based on the `siunitx` package.
+of currencies (amounts and units). It is based on the `siunitx` package
+for printing numbers.
 
 For instance, this code in the preamble defines a EUR monetary unit 
 
@@ -46,4 +47,9 @@ pdflatex currency_doc.tex
 biber currency_doc
 pdflatex currency_doc.tex
 ```
+
+## Availability
+
+This package is available on [github](https://github.com/antoinelejay/currency) and on 
+[CTAN](http://www.ctan.org/tex-archive/macros/latex/contrib/currency)
 
