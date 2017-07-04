@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{currency}
 %<*package>
-    [2017/06/15 v0.2 .dtx currency file]
+    [2017/07/04 v0.3 .dtx currency file]
 %</package>
 %
 %<*driver>
@@ -60,6 +60,8 @@
 %
 %
 % \changes{v1.0}{2016/07/07}{Initial version}
+% \changes{v0.3}{2017/07/04}{Dropping spurious space in the definition of cXXX}
+%
 %
 % \GetFileInfo{currency.dtx}
 %
@@ -108,6 +110,8 @@
 % \begin{center}
 % \url{https://github.com/antoinelejay/currency}
 % \end{center}
+% 
+%
 %
 % \section{Implementation}
 %
@@ -263,6 +267,7 @@
 % and \verb|\cXXX| (for printing only the symbols) are then defined, as
 % well as a style under the pgfkey \verb|/currency/XXX|.
 %
+%
 %    \begin{macrocode}
 \ExplSyntaxOn
 \newcommand{\DefineCurrency}[2]{%
@@ -306,7 +311,7 @@
 	{\pgfkeys{/currency/.cd,#1,currency,##1}}%
     \pgfkeys{/currency/font}%
     \pgfkeys{/currency/before}%
-    \text{\pgfkeys{/currency/prefix}\currencyunit}
+    \text{\pgfkeys{/currency/prefix}\currencyunit}% 
 	\pgfkeys{/currency/after}%
 \endgroup%
     }% end of \cXXX definition
