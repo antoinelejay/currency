@@ -41,6 +41,7 @@ for suggestions, feature requests, and bug reports.
 pdflatex currency.ins
 pdflatex currency.dtx
 makeindex -s gind.ist currency.idx
+makeindex -s gglo.ist -o currency.gls currency.glo
 pdflatex currency.dtx
 
 pdflatex currency_doc.tex
