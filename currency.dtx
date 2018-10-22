@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{currency}
 %<*package>
-    [2017/07/04 v0.3 .dtx currency file]
+    [2018/10/22 v0.4 .dtx currency file]
 %</package>
 %
 %<*driver>
@@ -62,6 +62,7 @@
 % \changes{v0.1}{2016/05/25}{Initial version}
 % \changes{v0.2}{2016/06/15}{Adding vXXX as an alias for dXXX}
 % \changes{v0.3}{2017/07/04}{Dropping spurious space in the definition of cXXX}
+% \changes{v0.4}{2018/10/22}{Adding generic macros instead of using DeclareDocumentCommand inside a def because this no longer work with TexLive 2018}
 %
 %
 % \GetFileInfo{currency.dtx}
@@ -260,31 +261,25 @@
 % The first argument is the name of the currency, normally its ISO symbol (3 letters).
 % This commands defines two global commands.
 %
-% \begin{macro}{\DefineCurrency} 
-% Define the parameters for a new currency. The first parameter is 
-% a three letters code of type \verb|XXX| (actually, it should by any suitable word).
-% Global commands \verb|\dXXX|
-% (for printing currency with an amount)
-% and \verb|\cXXX| (for printing only the symbols) are then defined, as
-% well as a style under the pgfkey \verb|/currency/XXX|.
+% \begin{macro}{\displayCurrency} 
+%
+% This is a generic macro for displaying the currency symbol and amount. This macro does not aim
+% at being called directly.
 %
 %
 %    \begin{macrocode}
 \ExplSyntaxOn
-\newcommand{\DefineCurrency}[2]{%
-\pgfkeys{/currency/#1/.style={#2}}%%
-% define the currency with digits as \dXXX
-\global\expandafter\DeclareDocumentCommand\csname d#1\endcsname{o m}{%
+\DeclareDocumentCommand{\displayCurrency}{m o m}{
 \begingroup%
 % default parameters, to put outside
 \sisetup{round-mode=places,round-precision=2}
-\IfNoValueTF{##1}%
+\IfNoValueTF{#2}%
     {\pgfkeys{/currency/.cd,#1,currency}}%
-    {\pgfkeys{/currency/.cd,#1,currency,##1}}%
+    {\pgfkeys{/currency/.cd,#1,currency,#2}}%
 \ifbool{currencynumber}%
     {\sisetup{parse-numbers=true}}%
     {\sisetup{parse-numbers=false}}%
-\edef\value{##2}% store the value of the currency
+\edef\value{#3}% store the value of the currency
 %
 \ifprintbefore%
 % true clause / print the unit before
@@ -302,22 +297,50 @@
 \pgfkeys{/currency/after}%
 \fi%
 \endgroup%
-    }% end of \dXXX definition
-    \tl_set:cx {v#1}{\use:c {d#1}}
-    % define the currency symbol as \cXXX with one optional argument
-    \global\expandafter\DeclareDocumentCommand\csname c#1\endcsname{o}{%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\displayCurrencySymbol} 
+%
+% This is a generic macro for displaying the currency symbol. This macro does not aim
+% at being called directly.
+%
+%    \begin{macrocode}
+\DeclareDocumentCommand{\displayCurrencySymbol}{m o}{
 \begingroup%
-    \IfNoValueTF{##1}%
+    \IfNoValueTF{#2}%
 	{\pgfkeys{/currency/.cd,#1,currency}}%
-	{\pgfkeys{/currency/.cd,#1,currency,##1}}%
+	{\pgfkeys{/currency/.cd,#1,currency,#2}}%
     \pgfkeys{/currency/font}%
     \pgfkeys{/currency/before}%
     \text{\pgfkeys{/currency/prefix}\currencyunit}% 
 	\pgfkeys{/currency/after}%
 \endgroup%
-    }% end of \cXXX definition
-}%
+}
+%    \end{macrocode}
+% \end{macro}
 \ExplSyntaxOff
+%
+% \begin{macro}{\DefineCurrency} 
+% Define the parameters for a new currency. The first parameter is 
+% a three letters code of type \verb|XXX| (actually, it should by any suitable word).
+% Global commands \verb|\dXXX|
+% (for printing currency with an amount)
+% and \verb|\cXXX| (for printing only the symbols) are then defined, as
+% well as a style under the pgfkey \verb|/currency/XXX|.
+%
+%    \begin{macrocode}
+\newcommand{\DefineCurrency}[2]{%
+\pgfkeys{/currency/#1/.style={#2}}%%
+% define the currency with digits as \dXXX
+\csgdef{d#1}{\displayCurrency{#1}}
+% end of \dXXX definition
+% define the currency symbol as \cXXX with one optional argument
+% \global\expandafter\DeclareDocumentCommand\csname c#1\endcsname{o}{%
+\csgdef{c#1}{\displayCurrencySymbol{#1}}
+% end of \cXXX definition
+}%
 %    \end{macrocode}
 % \end{macro}
 %
