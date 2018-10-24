@@ -1,0 +1,91 @@
+%%
+%% Copyright (C) 2018 by Antoine Lejay 
+%%
+%% This file may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3 of this license
+%% or (at your option) any later version.  The latest version of this
+%% license is in:
+%% 
+%%    http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.3 or later is part of all distributions of LaTeX version
+%% 2005/12/01 or later.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% This file aims at testing the currency package. 
+%%
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[frenchb]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{currency}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage[a4paper,margin=0.5cm]{geometry}
+\usepackage{pgfmath}
+
+\def\myeuro{euro}
+\DefineCurrency{EUR}{name={\myeuro},plural={euros},symbol={\euro},iso={EUR},kind=iso,base=2}
+\DefineCurrency{USD}{name={dollar},plural={dollars},symbol={\$},iso={USD},kind=iso,base=2}
+\DefineCurrency{JPY}{name={yen}, plural={yens}, symbol={\textyen}, iso={JPY}, kind=iso,cents=false} 
+\DefineCurrency{GBP}{name={pound},pre=true,plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso,base=2} 
+
+
+\begin{document}
+
+
+For the \verb|kind| option:
+\begin{center}
+\begin{tabular}{l r r}
+    \toprule
+   code & output & expected \\
+   \midrule
+    \verb|\dEUR[kind=symbol]{123}| & \dEUR[kind=symbol]{123} & 123 \EUR{}\\
+    \verb|\dEUR[kind=name]{123}| & \dEUR[kind=name]{123} & 123 euro\\
+    \verb|\dEUR[kind=plural]{123}| & \dEUR[kind=plural]{123} & 123 euros\\
+    \verb|\dEUR[kind=iso]{123}| & \dEUR[kind=iso]{123} & 123 EUR\\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+For the \verb|cents| options.
+\begin{center}
+\begin{tabular}{l r r}
+    \toprule
+   code & output & expected \\
+   \midrule
+    \verb|\dEUR[cents=true]{123}| & \dEUR[cents=true]{123} & 123 EUR\\
+    \verb|\dEUR[cents=always]{123}| &  \dEUR[cents=always]{123}    & 123.00 EUR\\
+    \verb|\dEUR[cents=true]{123.1}| &  \dEUR[cents=true]{123.1}    & 123.10 EUR\\
+    \verb|\dEUR[cents=always]{123.1}| &  \dEUR[cents=always]{123.1}  & 123.10 EUR\\
+    \verb|\dEUR[cents=true]{123.123}| &  \dEUR[cents=true]{123.123}  & 123.12 EUR\\
+    \verb|\dEUR[cents=true]{123.129}| &  \dEUR[cents=true]{123.129}  & 123.13 EUR\\
+    \verb|\dEUR[cents=false]{123.120}| &  \dEUR[cents=false]{123.120} & 123 EUR\\
+    \verb|\dEUR[cents=false]{123.00}| &  \dEUR[cents=false]{123.00}  & 123 EUR\\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{l r r}
+    \toprule
+   code & output & expected \\
+   \midrule
+    \verb|\dEUR[pre=true]{123}| & \dEUR[pre=true]{123} & EUR 123\\
+    \verb|\dEUR[pre=true,kind=symbol]{123}| & \dEUR[pre=true,kind=symbol]{123} & \EUR{} 123\\
+    \verb|\dEUR[pre=true,kind=symbol,before=k]{123}| & \dEUR[pre=true,kind=symbol,before=k]{123} & k\EUR{} 123\\
+    \verb|\dEUR[pre=true,kind=symbol,before=\color{red}]{123}| & \dEUR[pre=true,kind=symbol,before=\color{red}]{123} & {\color{red}\EUR{} 123}\\
+    \verb|\dEUR[pre=true,kind=symbol,pre-between={~\color{red}}]{123}| & \dEUR[pre=true,kind=symbol,pre-between={~\color{red}}]{123} & {\EUR{}~\color{red}123}\\
+    \verb|\dEUR[kind=symbol,post-between={~k}]{123}| & \dEUR[kind=symbol,post-between={~k}]{123} & 123~k\EUR{}\\
+    \verb|\dEUR[kind=symbol,before=[,after=]]{123}| & \dEUR[kind=symbol,before=[,after=]]{123} & [123~\EUR{}]\\
+    \verb|\dEUR[pre=false]{123}| & \dEUR[pre=false]{123} & 123~EUR\\
+    \verb|\dEUR[pre=false,prefix=k]{123}| & \dEUR[pre=false,prefix=k]{123} & 123 kEUR\\
+    \verb|\dEUR[pre=true,prefix=k]{123}| & \dEUR[pre=true,prefix=k]{123} & kEUR 123\\
+    \verb|\dEUR[pre=false,prefix=k]{123}| & \dEUR[pre=false,prefix=k]{123} & 123 kEUR\\
+    \verb|\dEUR[pre=false,kind=symbol,prefix=k]{123}| & \dEUR[pre=false,kind=symbol,prefix=k]{123} & 123 k\EUR{}\\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}
