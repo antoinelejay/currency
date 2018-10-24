@@ -8,7 +8,7 @@
 \usepackage{filecontents}
 \usepackage[
 backend=biber,
-style=cnltx,
+%style=cnltx,  % incompatible with biblatex 3.3
 sortlocale=en_EN,
 indexing=cite,
 useprefix]{biblatex}
@@ -17,6 +17,7 @@ useprefix]{biblatex}
 \addbibresource{\jobname.bib}
 
 \newnote*\doccorrectedsinceversion[1]{Documentation corrected in version~#1}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{filecontents*}{\jobname.bib}
