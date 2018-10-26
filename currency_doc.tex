@@ -63,9 +63,14 @@ useprefix]{biblatex}
   } ,
   add-cmds = 
   {
-      dXXX,cXXX,CurrencySetup
+      dXXX,cXXX,CurrencySetup,DefineCurrency,CurrencySetupAppend
   } ,
   add-silent-cmds = {
+  } ,
+  add-listings-options =
+  {
+    morekeywords={name,plural,iso,symbol,pre-between,post-between,before,before+,before<,font,font+,after,after+,after<,prefix,kind,cents,pre,number,base},
+    alsoletter={+,<,-},
   } ,
   index-setup = { othercode=\footnotesize, level=\section , noclearpage } ,
   makeindex-setup = {  columns=3, columnsep=1em }
@@ -75,7 +80,7 @@ useprefix]{biblatex}
 \DefineCurrency{EUR}{name={euro},plural={euros},symbol={\euro},iso={EUR},kind=iso,base=2}
 \DefineCurrency{USD}{name={dollar},plural={dollars},symbol={\$},iso={USD},kind=iso,base=2}
 \DefineCurrency{JPY}{name={yen}, plural={yens}, symbol={\textyen}, iso={JPY}, kind=iso,cents=false} 
-\DefineCurrency{GBP}{name={pound},pre=true,plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso,base=2} 
+\DefineCurrency{GBP}{name={pound}, pre=true, plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso, base=2}
 
 
 \begin{document}
@@ -139,14 +144,14 @@ See Section~\ref{sec:using}.
 
 For example, to define the US dollars, we set
 
-\begin{sourcecode}
-    \DefineCurrency{USD}{name={dollar},plural={dollars},iso={USD},kind=iso,symbol={\$}}
+\begin{sourcecode}[add-sourcecode-options={deletedelim=*[s][\color{math}]{$}{$}}]
+    \DefineCurrency{USD}{name={dollar}, plural={dollars}, iso={USD}, kind=iso, symbol={\$}}
 \end{sourcecode}
 
 
 Other styles may be defined through \cs*{pgfkeys} by following this example:
 \begin{example}
-    \pgfkeys{/currency/my style/.style={locale=US,kind=plural}}
+    \pgfkeys{/currency/my style/.style={locale=US, kind=plural}}
     \dUSD[my style]{100.10}
 \end{example}
 
@@ -195,11 +200,11 @@ to control the ways the values are printed (separators, ...).
 
 No currency are actually defined in \pkg{currency}.
 Euros, US dollars, yens and pounds could be defined by 
-\begin{sourcecode}
+\begin{sourcecode}[add-sourcecode-options={deletedelim=*[s][\color{math}]{$}{$}}]
     \DefineCurrency{EUR}{name={euro}, plural={euros}, symbol={\euro}, iso={EUR}, kind=iso}
     \DefineCurrency{USD}{name={dollar}, plural={dollars}, symbol={\$}, iso={USD}, kind=iso} 
     \DefineCurrency{JPY}{name={yen}, plural={yens}, symbol={\textyen}, iso={JPY}, kind=iso,cents=false} 
-    \DefineCurrency{GBP}{name={pound},pre=true,plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso} 
+    \DefineCurrency{GBP}{name={pound}, pre=true, plural={pounds}, symbol={\pounds}, iso={GBP}, kind=iso}
 \end{sourcecode}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -298,7 +303,7 @@ so that there is no need to use \verbcode|\| after a command.
 \subsection*{Using a prefix}
 
 \begin{example}
-    The total cost of the project is \dEUR[prefix=M,kind=symbol]{0.5}.
+    The total cost of the project is \dEUR[prefix=M, kind=symbol]{0.5}.
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -310,7 +315,7 @@ for special purposes, or for monetary units with other bases such as the Kuwaiti
 which is decomposed in \num{1000} fils.
 
 \begin{example}
-    \DefineCurrency{KWD}{name={dinar},plural={dinars},symbol={KD},iso={KWD},kind=iso,base=3}
+    \DefineCurrency{KWD}{name={dinar}, plural={dinars}, symbol={KD}, iso={KWD}, kind=iso, base=3}
     $\dUSD{1}=\dKWD{0.29963}$
 \end{example}
 
@@ -337,8 +342,8 @@ However, they should be passed as boolean keys.
     \textit{It costs \dUSD{1}}.
     \textit{It costs \dUSD[font+=\bfseries]{1}}.
     \textit{It costs \dUSD[font=\bfseries]{1}}.
-    \textit{It costs \dUSD[font=\bfseries,detect-weight=true]{1}}.
-    \textit{It costs \dUSD[font=\bfseries,detect-all=true]{1}}.
+    \textit{It costs \dUSD[font=\bfseries, detect-weight=true]{1}}.
+    \textit{It costs \dUSD[font=\bfseries, detect-all=true]{1}}.
     \end{empty}
 \end{example}
 
