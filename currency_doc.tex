@@ -142,12 +142,17 @@ These commands are defined globally.
 See Section~\ref{sec:using}.
 
 
-For example, to define the US dollars, we set
+For example, to define the US dollars an ISO suffix, we set
 
 \begin{sourcecode}[add-sourcecode-options={deletedelim=*[s][\color{math}]{$}{$}}]
     \DefineCurrency{USD}{name={dollar}, plural={dollars}, iso={USD}, kind=iso, symbol={\$}}
 \end{sourcecode}
 
+To define the US dollars using a symbol prefix, we set
+
+\begin{sourcecode}[add-sourcecode-options={deletedelim=*[s][\color{math}]{$}{$}}]
+    \DefineCurrency{USD}{name={dollar}, plural={dollars}, iso={USD}, kind=symbol, symbol={\$}, pre, pre-between={}}
+\end{sourcecode}
 
 Other styles may be defined through \cs*{pgfkeys} by following this example:
 \begin{example}
